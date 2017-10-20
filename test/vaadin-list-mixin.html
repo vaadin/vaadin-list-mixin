@@ -324,6 +324,32 @@
 
           expect(nav._scrollerElement.scrollTop).to.be.greaterThan(0);
         });
+
+        it('should move scroll when setting selected', () => {
+          nav.orientation = 'horizontal';
+          let pixels1 = 0;
+          nav._scroll = pixels => pixels1 = pixels;
+          nav.selected = 2;
+          expect(pixels1).to.be.greaterThan(0);
+        });
+
+        it('should compute correctly scroll position when selected is set as a string', () => {
+          nav.orientation = 'horizontal';
+
+          let pixels1, pixels2;
+
+          // When a numeric attr is set from string, polymer converts it to a number when assigning
+          // the property, but the observer `_selectedChanged` is called with the original string,
+          // hence calculations in `_scrollToItem` fail (issue #10)
+          nav._scroll = pixels => pixels1 = pixels;
+          nav.selected = '2';
+
+          nav._scroll = pixels => pixels2 = pixels;
+          nav.selected = 2;
+
+          expect(pixels1).to.be.equal(pixels2);
+        });
+        
       });
     });
   </script>
