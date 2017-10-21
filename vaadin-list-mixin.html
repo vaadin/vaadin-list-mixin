@@ -48,7 +48,6 @@ This program is available under Apache License Version 2.0, available at https:/
       });
 
       if (this._navItems.length) {
-        this._selectedChanged(this.selected);
         this._setFocusable(this.selected);
       }
     }
@@ -143,24 +142,25 @@ This program is available under Apache License Version 2.0, available at https:/
 
     // Scroll the container to have the next item by the edge of the viewport
     _scrollToItem(idx) {
+      // idx could be a string e.g. when `selected` is set from an attribute
+      idx = parseInt(idx);
+
       const item = this._navItems[idx];
-      if (!item) {
-        return;
+      if (item) {
+        const props = this._vertical ? ['top', 'bottom'] : ['left', 'right'];
+        const scrollerRect = this._scrollerElement.getBoundingClientRect();
+        const nextItemRect = (this._navItems[idx + 1] || item).getBoundingClientRect();
+        const prevItemRect = (this._navItems[idx - 1] || item).getBoundingClientRect();
+
+        let scrollDistance = 0;
+        if (nextItemRect[props[1]] >= scrollerRect[props[1]]) {
+          scrollDistance = nextItemRect[props[1]] - scrollerRect[props[1]];
+        } else if (prevItemRect[props[0]] <= scrollerRect[props[0]]) {
+          scrollDistance = prevItemRect[props[0]] - scrollerRect[props[0]];
+        }
+
+        this._scroll(scrollDistance);
       }
-
-      const props = this._vertical ? ['top', 'bottom'] : ['left', 'right'];
-      const scrollerRect = this._scrollerElement.getBoundingClientRect();
-      const nextItemRect = (this._navItems[idx + 1] || item).getBoundingClientRect();
-      const prevItemRect = (this._navItems[idx - 1] || item).getBoundingClientRect();
-
-      let scrollDistance = 0;
-      if (nextItemRect[props[1]] >= scrollerRect[props[1]]) {
-        scrollDistance = nextItemRect[props[1]] - scrollerRect[props[1]];
-      } else if (prevItemRect[props[0]] <= scrollerRect[props[0]]) {
-        scrollDistance = prevItemRect[props[0]] - scrollerRect[props[0]];
-      }
-
-      this._scroll(scrollDistance);
     }
 
     get _vertical() {
