@@ -253,7 +253,7 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     _onMouseFocus(event) {
-      if (!this.focusFollowsMouse) return;
+      if (!this.focusFollowsMouse || this.items.indexOf(this.focused) === -1) return;
 
       if (event.target._hasVaadinItemMixin && !event.target.disabled) {
         this._focus(this.items.indexOf(event.target));
