@@ -62,6 +62,15 @@ This program is available under Apache License Version 2.0, available at https:/
           type: Array,
           readOnly: true,
           notify: true
+        },
+
+        /**
+         * Set this property to `true` to make the mouse pointer update the focused item,
+         * unifying mouse and keyboard navigation.
+         */
+        focusFollowsMouse: {
+          type: Boolean,
+          value: false
         }
       };
     }
@@ -74,6 +83,9 @@ This program is available under Apache License Version 2.0, available at https:/
       super.ready();
       this.addEventListener('keydown', e => this._onKeydown(e));
       this.addEventListener('click', e => this._onClick(e));
+
+      this.addEventListener('mousemove', e => this._onMouseFocus(e));
+      this.addEventListener('mouseleave', e => this._onMouseFocus(e));
 
       this._observer = new Polymer.FlattenedNodesObserver(this, info => {
         this._setItems(this._filterItems(Array.from(this.children)));
@@ -113,7 +125,7 @@ This program is available under Apache License Version 2.0, available at https:/
 
       const item = this._filterItems(event.composedPath())[0];
       let idx;
-      if (item && !item.disabled && ((idx = this.items.indexOf(item)) >= 0)) {
+      if (item && !item.disabled && ((idx = this.items.indexOf(item)) >= 0) && (item.hasAttribute('focused') || !this.focusFollowsMouse)) {
         this.selected = idx;
       }
     }
@@ -181,15 +193,26 @@ This program is available under Apache License Version 2.0, available at https:/
 
     _focus(idx) {
       const item = this.items[idx];
-      this.items.forEach(e => e.focused = e === item);
-      this._setFocusable(idx);
-      this._scrollToItem(idx);
-      item.focus();
+      this.items.forEach(e => { e._setFocused(e === item) });
+
+      if (item) {
+        this._setFocusable(idx);
+        this._scrollToItem(idx);
+        item.focus();
+      } else {
+        this._setFocusable(0);
+      }
     }
 
     focus() {
       // In initialisation (e.g vaadin-dropdown-menu) observer might not been run yet.
       this._observer.flush();
+
+      // Make the selected item the first one to get focused
+      if (this.selected) {
+        this._setFocusable(this.selected);
+      }
+
       (this.querySelector('[tabindex="0"]') || this.items[0]).focus();
     }
 
@@ -227,6 +250,16 @@ This program is available under Apache License Version 2.0, available at https:/
 
     _scroll(pixels) {
       this._scrollerElement['scroll' + (this._vertical ? 'Top' : 'Left')] += pixels;
+    }
+
+    _onMouseFocus(event) {
+      if (!this.focusFollowsMouse) return;
+
+      if (event.target._hasVaadinItemMixin && !event.target.disabled) {
+        this._focus(this.items.indexOf(event.target));
+      } else {
+        this._focus(-1);
+      }
     }
   };
 </script>
