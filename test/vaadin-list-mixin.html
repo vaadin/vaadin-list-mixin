@@ -479,6 +479,86 @@
           expect(list._scrollerElement.scrollTop).to.be.greaterThan(0);
         });
       });
+
+      describe('Multiple', () => {
+        const ctrlKeyClick = new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true,
+          view: window,
+          ctrlKey: true
+        });
+
+        const shiftKeyClick = new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true,
+          view: window,
+          shiftKey: true
+        });
+
+        it('should clear selected when multiple=true', () => {
+          list.selected = 3;
+          list.multiple = true;
+          expect(list.selected).to.be.equal(undefined);
+        });
+
+        it('should move selected to multipleSelected when multiple=true', () => {
+          list.selected = 3;
+          list.multiple = true;
+          expect(list.multipleSelected).to.eql([3]);
+        });
+
+        it('should clear multipleSelected when multiple=false', () => {
+          list.multiple = true;
+          list.multipleSelected = [3];
+          list.multiple = false;
+          expect(list.multipleSelected).to.eql([]);
+        });
+
+        it('should set multipleSelected when clicking item', () => {
+          list.multiple = true;
+          list.items[3].click();
+          expect(list.selected).to.be.equal(undefined);
+          expect(list.multipleSelected).to.eql([3]);
+        });
+
+        it('should set selected when clicking item and multiple=false', () => {
+          list.items[3].click();
+          expect(list.selected).to.be.equal(3);
+          expect(list.multipleSelected).to.eql([]);
+        });
+
+        it('should set one item multipleSelected when clicking', () => {
+          list.multiple = true;
+          list.items[1].click();
+          expect(list.multipleSelected).to.eql([1]);
+          list.items[3].click();
+          expect(list.multipleSelected).to.eql([3]);
+        });
+
+        it('should set multiple items multipleSelected when clicking with ctrlKey', () => {
+          list.multiple = true;
+          list.items[1].dispatchEvent(ctrlKeyClick);
+          expect(list.multipleSelected).to.eql([1]);
+          list.items[3].dispatchEvent(ctrlKeyClick);
+          expect(list.multipleSelected).to.eql([1, 3]);
+        });
+
+        it('should set remove selection from multipleSelected with ctrlKey', () => {
+          list.multiple = true;
+          list.items[1].dispatchEvent(ctrlKeyClick);
+          expect(list.multipleSelected).to.eql([1]);
+          list.items[1].dispatchEvent(ctrlKeyClick);
+          expect(list.multipleSelected).to.eql([]);
+        });
+
+        it('should set range of multiple items multipleSelected when clicking with shiftKey', () => {
+          list.multiple = true;
+          list.items[0].dispatchEvent(shiftKeyClick);
+          expect(list.multipleSelected).to.eql([0]);
+          list.items[3].dispatchEvent(shiftKeyClick);
+          expect(list.multipleSelected).to.eql([0, 1, 3]);
+        });
+      });
     });
   </script>
 </body>

@@ -37,6 +37,20 @@ This program is available under Apache License Version 2.0, available at https:/
         },
 
         /**
+         * The indexes of the items selected in the items array when `multiple` selection is allowed.
+         */
+        multipleSelected: {
+          type: Array,
+          notify: true,
+          value: function() {
+            return [];
+          }
+        },
+
+        __lastMultipleSelected: Number,
+        __lastMultipleFocused: Number,
+
+        /**
          * Define how items are disposed in the dom.
          * Possible values are: `horizontal|vertical`.
          * It also changes navigation keys from left/right to up/down.
@@ -65,6 +79,16 @@ This program is available under Apache License Version 2.0, available at https:/
         },
 
         /**
+         * Specifies that multiple options can be selected at once.
+         */
+        multiple: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+          observer: '_multipleChanged'
+        },
+
+        /**
          * The search buffer for the keyboard selection feature.
          */
         _searchBuf: {
@@ -75,7 +99,18 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     static get observers() {
-      return ['_enhanceItems(items, orientation, selected)'];
+      return [
+        `_enhanceItems(
+          items,
+          orientation,
+          multiple,
+          selected,
+          multipleSelected,
+          __lastMultipleSelected,
+          __lastMultipleFocused,
+          multipleSelected.*
+          )`
+      ];
     }
 
     ready() {
@@ -88,7 +123,7 @@ This program is available under Apache License Version 2.0, available at https:/
       });
     }
 
-    _enhanceItems(items, orientation, selected) {
+    _enhanceItems(items, orientation, multiple, selected, multipleSelected, lastMultipleSelected, lastMultipleFocused) {
       if (items) {
         this.setAttribute('aria-orientation', orientation || 'vertical');
         this.items.forEach(item => {
@@ -96,12 +131,26 @@ This program is available under Apache License Version 2.0, available at https:/
           item.updateStyles();
         });
 
-        this._setFocusable(selected);
+        if (multiple) {
+          this._setFocusable(lastMultipleFocused);
+          const lastSelectedItem = items[lastMultipleSelected];
 
-        const itemToSelect = items[selected];
-        items.forEach(item => item.selected = item === itemToSelect);
-        if (itemToSelect && !itemToSelect.disabled) {
-          this._scrollToItem(selected);
+          if (multipleSelected) {
+            const selectedItems = multipleSelected.map(selectedId => items[selectedId]);
+            items.forEach(item => item.selected = selectedItems.includes(item));
+          }
+
+          if (lastSelectedItem && !lastSelectedItem.disabled) {
+            this._scrollToItem(lastMultipleSelected);
+          }
+        } else {
+          this._setFocusable(selected);
+
+          const itemToSelect = items[selected];
+          items.forEach(item => item.selected = item === itemToSelect);
+          if (itemToSelect && !itemToSelect.disabled) {
+            this._scrollToItem(selected);
+          }
         }
       }
     }
@@ -115,13 +164,47 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     _onClick(event) {
-      if (event.metaKey || event.shiftKey || event.ctrlKey) {
+      const item = this._filterItems(event.composedPath())[0];
+      const idx = item && !item.disabled ? this.items.indexOf(item) : -1;
+      if (idx < 0) {
         return;
       }
 
-      const item = this._filterItems(event.composedPath())[0];
-      let idx;
-      if (item && !item.disabled && ((idx = this.items.indexOf(item)) >= 0)) {
+      if (this.multiple) {
+        if (event.shiftKey) {
+          if (this.__lastMultipleSelected !== undefined && this.__lastMultipleSelected === idx) {
+            return;
+          }
+          if (this.multipleSelected.length) {
+            this.multipleSelected = this._getAvailableIndexes(
+              Math.min(this.__lastMultipleSelected, idx),
+              Math.max(this.__lastMultipleSelected, idx),
+              item => !item.disabled
+            );
+            this.__lastMultipleSelected = idx;
+          } else {
+            this.multipleSelected = [idx];
+            this.__lastMultipleSelected = idx;
+          }
+        } else if (event.metaKey || event.ctrlKey) {
+          if (this.multipleSelected.includes(idx)) {
+            this.splice('multipleSelected', this.multipleSelected.indexOf(idx), 1);
+          } else {
+            this.push('multipleSelected', idx);
+            this.__lastMultipleSelected = idx;
+          }
+        } else {
+          this.multipleSelected = [idx];
+          this.__lastMultipleSelected = idx;
+        }
+
+        this.__lastMultipleFocused = idx;
+
+      } else {
+        if (event.metaKey || event.shiftKey || event.ctrlKey) {
+          return;
+        }
+
         this.selected = idx;
       }
     }
@@ -204,6 +287,17 @@ This program is available under Apache License Version 2.0, available at https:/
       return -1;
     }
 
+    _getAvailableIndexes(start, end, condition) {
+      const availableIndexes = [];
+      for (let i = start; i < end + 1; i++) {
+        const item = this.items[i];
+        if (condition(item)) {
+          availableIndexes.push(i);
+        }
+      }
+      return availableIndexes;
+    }
+
     _setFocusable(idx) {
       idx = this._getAvailableIndex(idx, 1, item => !item.disabled);
       const item = this.items[idx] || this.items[0];
@@ -259,6 +353,21 @@ This program is available under Apache License Version 2.0, available at https:/
 
     _scroll(pixels) {
       this._scrollerElement['scroll' + (this._vertical ? 'Top' : 'Left')] += pixels;
+    }
+
+    _multipleChanged(value, oldValue) {
+      // Changing from multiple to single selection, clear selection.
+      if (!value && oldValue) {
+        this.multipleSelected = [];
+        this.__lastMultipleSelected = undefined;
+        this.__lastMultipleFocused = undefined;
+      }
+
+      // Changing from single to multiple selection, add selected to multipleSelected.
+      if (value && !oldValue && this.selected !== undefined) {
+        this.push('multipleSelected', this.selected);
+        this.selected = undefined;
+      }
     }
   };
 </script>
