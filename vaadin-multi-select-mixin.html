@@ -12,7 +12,7 @@ This program is available under Apache License Version 2.0, available at https:/
    *
    * @polymerMixin
    */
-  Vaadin.MultipleMixin = superClass => class VaadinMultipleMixin extends Vaadin.ListMixin(superClass) {
+  Vaadin.MultiSelectMixin = superClass => class VaadinMultiSelectMixin extends Vaadin.ListMixin(superClass) {
     static get properties() {
       return {
         /**
@@ -47,7 +47,7 @@ This program is available under Apache License Version 2.0, available at https:/
     ready() {
       // Should be attached before click listener in list-mixin
       this.addEventListener('click', e => this._onMultipleClick(e));
-      
+
       super.ready();
       this.addEventListener('keydown', e => this._onMultipleKeydown(e));
     }
@@ -61,7 +61,7 @@ This program is available under Apache License Version 2.0, available at https:/
         const lastSelectedItem = this.selectedValues.slice(-1);
         if (selectedValues) {
           const selectedItems = selectedValues.map(selectedId => items[selectedId]);
-          items.forEach(item => item.selected = selectedItems.includes(item));
+          items.forEach(item => item.selected = selectedItems.indexOf(item) !== -1);
         }
         if (lastSelectedItem && !lastSelectedItem.disabled) {
           this._scrollToItem(lastSelectedItem);
@@ -75,7 +75,7 @@ This program is available under Apache License Version 2.0, available at https:/
       if (idx < 0 || !this.multiple) {
         return;
       }
-      
+
       event.preventDefault();
       if (event.shiftKey) {
         const lastSelected = this.selectedValues.slice(-1);
@@ -99,7 +99,7 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     __updateSelectedValues(idx) {
-      if (this.selectedValues.includes(idx)) {
+      if (this.selectedValues.indexOf(idx) !== -1) {
         this.splice('selectedValues', this.selectedValues.indexOf(idx), 1);
       } else {
         this.push('selectedValues', idx);
@@ -113,10 +113,10 @@ This program is available under Apache License Version 2.0, available at https:/
 
       const key = event.key.replace(/^Arrow/, '');
 
-      const focusedItem = this.items.find(item => item.getAttribute('tabindex') === '0');
+      const focusedItem = this.items.filter(item => item.getAttribute('tabindex') === '0')[0];
       const idx = this.items.indexOf(focusedItem);
 
-      if ((this._vertical && key === 'Up' || !this._vertical && key === 'Left') || 
+      if ((this._vertical && key === 'Up' || !this._vertical && key === 'Left') ||
           (this._vertical && key === 'Down' || !this._vertical && key === 'Right')) {
         this.__updateSelectedValues(idx);
       }
