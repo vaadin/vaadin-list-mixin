@@ -47,8 +47,9 @@ This program is available under Apache License Version 2.0, available at https:/
     ready() {
       // Should be attached before click listener in list-mixin
       this.addEventListener('click', e => this._onMultipleClick(e));
-
+      
       super.ready();
+      this.addEventListener('keydown', e => this._onMultipleKeydown(e));
     }
 
     _enhanceMultipleItems(items, multiple, selected, selectedValues) {
@@ -91,13 +92,33 @@ This program is available under Apache License Version 2.0, available at https:/
           this.selectedValues = [idx];
         }
       } else if (event.metaKey || event.ctrlKey) {
-        if (this.selectedValues.includes(idx)) {
-          this.splice('selectedValues', this.selectedValues.indexOf(idx), 1);
-        } else {
-          this.push('selectedValues', idx);
-        }
+        this.__updateSelectedValues(idx);
       } else {
         this.selectedValues = [idx];
+      }
+    }
+
+    __updateSelectedValues(idx) {
+      if (this.selectedValues.includes(idx)) {
+        this.splice('selectedValues', this.selectedValues.indexOf(idx), 1);
+      } else {
+        this.push('selectedValues', idx);
+      }
+    }
+
+    _onMultipleKeydown(event) {
+      if (!this.multiple || !event.shiftKey) {
+        return;
+      }
+
+      const key = event.key.replace(/^Arrow/, '');
+
+      const focusedItem = this.items.find(item => item.getAttribute('tabindex') === '0');
+      const idx = this.items.indexOf(focusedItem);
+
+      if ((this._vertical && key === 'Up' || !this._vertical && key === 'Left') || 
+          (this._vertical && key === 'Down' || !this._vertical && key === 'Right')) {
+        this.__updateSelectedValues(idx);
       }
     }
 

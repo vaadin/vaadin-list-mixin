@@ -105,8 +105,8 @@
   </test-fixture>
 
   <script>
-    function arrowDown(target) {
-      MockInteractions.keyDownOn(target, 40, [], 'ArrowDown');
+    function arrowDown(target, shiftKey = false) {
+      MockInteractions.keyDownOn(target, 40, [shiftKey ? 'shift' : ''], 'ArrowDown');
     }
 
     function arrowRight(target) {
@@ -117,8 +117,8 @@
       MockInteractions.keyDownOn(target, 40, [], 'Down');
     }
 
-    function arrowUp(target) {
-      MockInteractions.keyDownOn(target, 38, [], 'ArrowUp');
+    function arrowUp(target, shiftKey = false) {
+      MockInteractions.keyDownOn(target, 38, [shiftKey ? 'shift' : ''], 'ArrowUp');
     }
 
     function arrowLeft(target) {
@@ -513,7 +513,7 @@
           expect(list.selectedValues).to.eql([]);
         });
 
-        it('should set one item selectedValues when clicking', () => {
+        it('should set one item to the selectedValues when clicking', () => {
           list.multiple = true;
           list.items[1].click();
           expect(list.selectedValues).to.eql([1]);
@@ -521,7 +521,45 @@
           expect(list.selectedValues).to.eql([3]);
         });
 
-        it('should set multiple items selectedValues when clicking with ctrlKey', () => {
+        it('should add items to the selectedValues on arrowDown with shiftKey', () => {
+          list.multiple = true;
+          for (let i = 0; i < 5; i ++) {
+            arrowDown(list.items[i], true);
+          }
+
+          expect(list.selectedValues).to.eql([0, 1, 3, 5, 6]);
+        });
+
+        it('should remove items from the selectedValues on arrowDown with shiftKey', () => {
+          list.multiple = true;
+          list.selectedValues = [0, 1, 3, 5, 6];
+          for (let i = 1; i < 3; i ++) {
+            arrowDown(list.items[i], true);
+          }
+
+          expect(list.selectedValues).to.eql([3, 5, 6]);
+        });
+
+        it('should add items to the selectedValues on arrowUp with shiftKey', () => {
+          list.multiple = true;
+          for (let i = 5; i > 0; i --) {
+            arrowUp(list.items[i], true);
+          }
+
+          expect(list.selectedValues).to.eql([6, 5, 3, 1, 0]);
+        });
+
+        it('should remove items from the selectedValues on arrowUp with shiftKey', () => {
+          list.multiple = true;
+          list.selectedValues = [6, 5, 3, 1, 0];
+          for (let i = 3; i > 1; i --) {
+            arrowUp(list.items[i], true);
+          }
+
+          expect(list.selectedValues).to.eql([3, 1, 0]);
+        });
+
+        it('should set multiple items to the selectedValues when clicking with ctrlKey', () => {
           list.multiple = true;
           list.items[1].dispatchEvent(new MouseEvent('click', {
             bubbles: true,
@@ -541,7 +579,7 @@
           expect(list.selectedValues).to.eql([1, 3]);
         });
 
-        it('should set remove selection from selectedValues with ctrlKey', () => {
+        it('should set remove selection from the selectedValues with ctrlKey', () => {
           list.multiple = true;
           list.items[1].dispatchEvent(new MouseEvent('click', {
             bubbles: true,
@@ -559,7 +597,7 @@
           expect(list.selectedValues).to.eql([]);
         });
 
-        it('should set range of multiple items selectedValues when clicking with shiftKey', () => {
+        it('should set range of multiple items to the selectedValues when clicking with shiftKey', () => {
           list.multiple = true;
           list.items[0].dispatchEvent(new MouseEvent('click', {
             bubbles: true,
