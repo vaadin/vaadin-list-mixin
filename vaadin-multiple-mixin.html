@@ -1,0 +1,128 @@
+<!--
+@license
+Copyright (c) 2017 Vaadin Ltd.
+This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
+-->
+<link rel="import" href="vaadin-list-mixin.html">
+<script>
+  window.Vaadin = window.Vaadin || {};
+
+  /**
+   * A mixin for `nav` elements, facilitating navigation and selection of childNodes.
+   *
+   * @polymerMixin
+   */
+  Vaadin.MultipleMixin = superClass => class VaadinMultipleMixin extends Vaadin.ListMixin(superClass) {
+    static get properties() {
+      return {
+        /**
+         * Specifies that multiple options can be selected at once.
+         */
+        multiple: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+          observer: '_multipleChanged'
+        },
+
+        /**
+         * Array of indexes of the items selected in the items array
+         */
+        selectedValues: {
+          type: Array,
+          notify: true,
+          value: function() {
+            return [];
+          }
+        }
+      };
+    }
+
+    static get observers() {
+      return [
+        `_enhanceMultipleItems(items, multiple, selected, selectedValues, selectedValues.*)`
+      ];
+    }
+
+    ready() {
+      // Should be attached before click listener in list-mixin
+      this.addEventListener('click', e => this._onMultipleClick(e));
+
+      super.ready();
+    }
+
+    _enhanceMultipleItems(items, multiple, selected, selectedValues) {
+      if (!items) {
+        return;
+      }
+
+      if (multiple) {
+        const lastSelectedItem = this.selectedValues.slice(-1);
+        if (selectedValues) {
+          const selectedItems = selectedValues.map(selectedId => items[selectedId]);
+          items.forEach(item => item.selected = selectedItems.includes(item));
+        }
+        if (lastSelectedItem && !lastSelectedItem.disabled) {
+          this._scrollToItem(lastSelectedItem);
+        }
+      }
+    }
+
+    _onMultipleClick(event) {
+      const item = this._filterItems(event.composedPath())[0];
+      const idx = item && !item.disabled ? this.items.indexOf(item) : -1;
+      if (idx < 0 || !this.multiple) {
+        return;
+      }
+      
+      event.preventDefault();
+      if (event.shiftKey) {
+        const lastSelected = this.selectedValues.slice(-1);
+        if (lastSelected !== undefined && lastSelected === idx) {
+          return;
+        }
+        if (this.selectedValues.length) {
+          this.selectedValues = this._getAvailableIndexes(
+            Math.min(lastSelected, idx),
+            Math.max(lastSelected, idx),
+            item => !item.disabled
+          );
+        } else {
+          this.selectedValues = [idx];
+        }
+      } else if (event.metaKey || event.ctrlKey) {
+        if (this.selectedValues.includes(idx)) {
+          this.splice('selectedValues', this.selectedValues.indexOf(idx), 1);
+        } else {
+          this.push('selectedValues', idx);
+        }
+      } else {
+        this.selectedValues = [idx];
+      }
+    }
+
+    _getAvailableIndexes(start, end, condition) {
+      const availableIndexes = [];
+      for (let i = start; i < end + 1; i++) {
+        const item = this.items[i];
+        if (condition(item)) {
+          availableIndexes.push(i);
+        }
+      }
+      return availableIndexes;
+    }
+
+    _multipleChanged(value, oldValue) {
+      // Changing from multiple to single selection, clear selection.
+      if (!value && oldValue) {
+        this.selectedValues = [];
+      }
+
+      // Changing from single to multiple selection, add selected to selectedValues.
+      if (value && !oldValue && this.selected !== undefined) {
+        this.push('selectedValues', this.selected);
+        this.selected = undefined;
+      }
+    }
+  };
+</script>
