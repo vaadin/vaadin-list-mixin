@@ -7,7 +7,7 @@
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <script src="../../iron-test-helpers/mock-interactions.js"></script>
   <link rel="import" href="../../iron-test-helpers/iron-test-helpers.html">
-  <link rel="import" href="../vaadin-multi-select-mixin.html">
+  <link rel="import" href="../vaadin-multi-select-list-mixin.html">
   <link rel="import" href="../../test-fixture/test-fixture.html">
 </head>
 
@@ -35,7 +35,7 @@
     </template>
     <script>
       document.addEventListener('WebComponentsReady', () => {
-        class TestWrapper extends Vaadin.MultiSelectMixin(Polymer.Element) {
+        class TestWrapper extends Vaadin.MultiSelectListMixin(Polymer.Element) {
           static get is() {
             return 'test-list-element';
           }

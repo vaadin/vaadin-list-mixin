@@ -12,7 +12,7 @@ This program is available under Apache License Version 2.0, available at https:/
    *
    * @polymerMixin
    */
-  Vaadin.MultiSelectMixin = superClass => class VaadinMultiSelectMixin extends Vaadin.ListMixin(superClass) {
+  Vaadin.MultiSelectListMixin = superClass => class VaadinMultiSelectListMixin extends Vaadin.ListMixin(superClass) {
     static get properties() {
       return {
         /**
@@ -53,19 +53,18 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     _enhanceMultipleItems(items, multiple, selected, selectedValues) {
-      if (!items) {
+      if (!items || !multiple) {
         return;
       }
 
-      if (multiple) {
-        const lastSelectedItem = this.selectedValues.slice(-1);
-        if (selectedValues) {
-          const selectedItems = selectedValues.map(selectedId => items[selectedId]);
-          items.forEach(item => item.selected = selectedItems.indexOf(item) !== -1);
-        }
-        if (lastSelectedItem && !lastSelectedItem.disabled) {
-          this._scrollToItem(lastSelectedItem);
-        }
+      if (selectedValues) {
+        const selectedItems = selectedValues.map(selectedId => items[selectedId]);
+        items.forEach(item => item.selected = selectedItems.indexOf(item) !== -1);
+      }
+
+      const lastSelectedItem = this.selectedValues.slice(-1);
+      if (lastSelectedItem && !lastSelectedItem.disabled) {
+        this._scrollToItem(lastSelectedItem);
       }
     }
 
