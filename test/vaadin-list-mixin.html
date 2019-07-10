@@ -480,6 +480,24 @@
       });
 
       describe('Multiple', () => {
+        function clickWithCtrl(element) {
+          element.dispatchEvent(new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            ctrlKey: true
+          }));
+        }
+
+        function clickWithShift(element) {
+          element.dispatchEvent(new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            shiftKey: true
+          }));
+        }
+
         it('should clear selected when multiple=true', () => {
           list.selected = 3;
           list.multiple = true;
@@ -560,57 +578,26 @@
 
         it('should set multiple items to the selectedValues when clicking with ctrlKey', () => {
           list.multiple = true;
-          list.items[1].dispatchEvent(new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window,
-            ctrlKey: true
-          }));
+          clickWithCtrl(list.items[1]);
           expect(list.selectedValues).to.eql([1]);
 
-          // Duplicated cause not working in shady dom with same instance of event.
-          list.items[3].dispatchEvent(new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window,
-            ctrlKey: true
-          }));
+          clickWithCtrl(list.items[3]);
           expect(list.selectedValues).to.eql([1, 3]);
         });
 
         it('should set remove selection from the selectedValues with ctrlKey', () => {
           list.multiple = true;
-          list.items[1].dispatchEvent(new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window,
-            ctrlKey: true
-          }));
+          clickWithCtrl(list.items[1]);
           expect(list.selectedValues).to.eql([1]);
-          list.items[1].dispatchEvent(new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window,
-            ctrlKey: true
-          }));
+          clickWithCtrl(list.items[1]);
           expect(list.selectedValues).to.eql([]);
         });
 
         it('should set range of multiple items to the selectedValues when clicking with shiftKey', () => {
           list.multiple = true;
-          list.items[0].dispatchEvent(new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window,
-            shiftKey: true
-          }));
+          clickWithShift(list.items[0]);
           expect(list.selectedValues).to.eql([0]);
-          list.items[3].dispatchEvent(new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window,
-            shiftKey: true
-          }));
+          clickWithShift(list.items[3]);
           expect(list.selectedValues).to.eql([0, 1, 3]);
         });
       });

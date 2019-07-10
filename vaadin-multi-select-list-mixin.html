@@ -1,6 +1,6 @@
 <!--
 @license
-Copyright (c) 2017 Vaadin Ltd.
+Copyright (c) 2019 Vaadin Ltd.
 This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
 -->
 <link rel="import" href="vaadin-list-mixin.html">
@@ -40,7 +40,7 @@ This program is available under Apache License Version 2.0, available at https:/
 
     static get observers() {
       return [
-        `_enhanceMultipleItems(items, multiple, selected, selectedValues, selectedValues.*)`
+        `_enhanceMultipleItems(items, multiple, selected, selectedValues, __lastSelected, selectedValues.*)`
       ];
     }
 
@@ -52,7 +52,7 @@ This program is available under Apache License Version 2.0, available at https:/
       this.addEventListener('keydown', e => this._onMultipleKeydown(e));
     }
 
-    _enhanceMultipleItems(items, multiple, selected, selectedValues) {
+    _enhanceMultipleItems(items, multiple, selected, selectedValues, lastSelected) {
       if (!items || !multiple) {
         return;
       }
@@ -62,38 +62,31 @@ This program is available under Apache License Version 2.0, available at https:/
         items.forEach(item => item.selected = selectedItems.indexOf(item) !== -1);
       }
 
-      const lastSelectedItem = this.selectedValues.slice(-1);
-      if (lastSelectedItem && !lastSelectedItem.disabled) {
-        this._scrollToItem(lastSelectedItem);
+      if (lastSelected && !lastSelected.disabled) {
+        this._scrollToItem(lastSelected);
       }
     }
 
     _onMultipleClick(event) {
-      const item = this._filterItems(event.composedPath())[0];
-      const idx = item && !item.disabled ? this.items.indexOf(item) : -1;
+      const idx = this.__getItemIdxFromEvent(event);
       if (idx < 0 || !this.multiple) {
         return;
       }
 
       event.preventDefault();
       if (event.shiftKey) {
-        const lastSelected = this.selectedValues.slice(-1);
-        if (lastSelected !== undefined && lastSelected === idx) {
-          return;
-        }
+        const lastSelected = this.__lastSelected;
         if (this.selectedValues.length) {
-          this.selectedValues = this._getAvailableIndexes(
-            Math.min(lastSelected, idx),
-            Math.max(lastSelected, idx),
-            item => !item.disabled
-          );
+          this.__selectRange(lastSelected, idx);
         } else {
           this.selectedValues = [idx];
+          this.__lastSelected = idx;
         }
       } else if (event.metaKey || event.ctrlKey) {
         this.__updateSelectedValues(idx);
       } else {
         this.selectedValues = [idx];
+        this.__lastSelected = idx;
       }
     }
 
@@ -102,13 +95,30 @@ This program is available under Apache License Version 2.0, available at https:/
         this.splice('selectedValues', this.selectedValues.indexOf(idx), 1);
       } else {
         this.push('selectedValues', idx);
+        this.__lastSelected = idx;
       }
+    }
+
+    __getItemIdxFromEvent(event) {
+      const item = this._filterItems(event.composedPath())[0];
+      const idx = item && !item.disabled ? this.items.indexOf(item) : -1;
+      return idx;
+    }
+
+    __selectRange(lastSelected, idx) {
+      this.selectedValues = this._getAvailableIndexes(
+        Math.min(lastSelected, idx),
+        Math.max(lastSelected, idx),
+        item => !item.disabled
+      );
     }
 
     _onMultipleKeydown(event) {
       if (!this.multiple || !event.shiftKey) {
         return;
       }
+
+      const startItemIdx = this.__getItemIdxFromEvent(event);
 
       const key = event.key.replace(/^Arrow/, '');
 
@@ -117,7 +127,11 @@ This program is available under Apache License Version 2.0, available at https:/
 
       if ((this._vertical && key === 'Up' || !this._vertical && key === 'Left') ||
           (this._vertical && key === 'Down' || !this._vertical && key === 'Right')) {
-        this.__updateSelectedValues(idx);
+        if (this.__lastSelected === undefined ||
+            this.selectedValues.slice(-1)[0] !== startItemIdx) {
+          this.__lastSelected = startItemIdx;
+        }
+        this.__selectRange(this.__lastSelected, idx);
       }
     }
 
