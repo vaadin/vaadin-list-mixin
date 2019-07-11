@@ -86,6 +86,7 @@ This program is available under Apache License Version 2.0, available at https:/
       // Changing from multiple to single selection, clear selection.
       if (!value && oldValue) {
         this.selectedValues = [];
+        this.items.forEach(item => item.selected = false);
       }
 
       // Changing from single to multiple selection, add selected to selectedValues.

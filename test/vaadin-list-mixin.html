@@ -499,6 +499,13 @@
           expect(list.selectedValues).to.eql([]);
         });
 
+        it('should reset selected items when multiple=false', () => {
+          list.multiple = true;
+          list.selectedValues = [1, 3];
+          list.multiple = false;
+          expect(list.items.filter(item => item.selected).length).to.eql(0);
+        });
+
         it('should set selectedValues when clicking item', () => {
           list.multiple = true;
           list.items[3].click();
