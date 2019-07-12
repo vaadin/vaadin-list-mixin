@@ -61,7 +61,7 @@ This program is available under Apache License Version 2.0, available at https:/
         items.forEach(item => item.selected = selectedItems.indexOf(item) !== -1);
       }
 
-      const lastSelectedItem = this.selectedValues.slice(-1);
+      const lastSelectedItem = this.selectedValues.slice(-1)[0];
       if (lastSelectedItem && !lastSelectedItem.disabled) {
         this._scrollToItem(lastSelectedItem);
       }
@@ -76,9 +76,9 @@ This program is available under Apache License Version 2.0, available at https:/
 
       event.preventDefault();
       if (this.selectedValues.indexOf(idx) !== -1) {
-        this.splice('selectedValues', this.selectedValues.indexOf(idx), 1);
+        this.selectedValues = this.selectedValues.filter(v => v !== idx);
       } else {
-        this.push('selectedValues', idx);
+        this.selectedValues = this.selectedValues.concat(idx);
       }
     }
 
