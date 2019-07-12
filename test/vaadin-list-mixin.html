@@ -526,7 +526,7 @@
           expect(list.items[1].selected).to.be.true;
           list.items[3].click();
           expect(list.selectedValues).to.eql([1, 3]);
-          expect(list.items[1].selected).to.be.true;
+          expect(list.items[3].selected).to.be.true;
         });
 
         it('should remove item from the selectedValues when clicking', () => {
@@ -543,7 +543,10 @@
         it('should fire one selected-values-changed event', () => {
           list.multiple = true;
           const spy = sinon.spy();
-          list.addEventListener('selected-values-changed', spy);
+          list.addEventListener('selected-values-changed', e => {
+            expect(e.detail.value).to.eql([3]);
+            spy();
+          });
           list.items[3].click();
           expect(spy.calledOnce).to.be.true;
         });
