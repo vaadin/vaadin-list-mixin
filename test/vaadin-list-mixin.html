@@ -116,6 +116,18 @@
     </template>
   </test-fixture>
 
+  <test-fixture id="listHidden">
+      <template>
+        <test-list-element style="width: 400px; height: 400px;">
+          <test-item-element>Foo</test-item-element>
+          <test-item-element hidden>Bar</test-item-element>
+          <test-item-element>Bax</test-item-element>
+          <test-item-element disabled>Bay</test-item-element>
+          <test-item-element>Fox</test-item-element>
+        </test-list-element>
+      </template>
+    </test-fixture>
+
   <script>
     function arrowDown(target) {
       MockInteractions.keyDownOn(target, 40, [], 'ArrowDown');
@@ -596,6 +608,25 @@
 
           list.items[3].click();
           expect(list._scrollerElement.scrollTop).to.be.greaterThan(0);
+        });
+      });
+    });
+    describe('vaadin-list-mixin-hidden', () => {
+      let list;
+
+      beforeEach(done => {
+        list = fixture('listHidden');
+        Polymer.RenderStatus.afterNextRender(list, done);
+      });
+
+      describe('focus', () => {
+
+        beforeEach(() => list._focus(0));
+
+        it('should move focus to next not hidden element on "arrow-down" keydown', () => {
+          arrowDown(list);
+          expect(list.items[1].focused).to.be.false;
+          expect(list.items[2].focused).to.be.true;
         });
       });
     });
