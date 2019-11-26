@@ -54,11 +54,16 @@
       <style>
         :host {
           display: block;
-          flex-shrink: 0; /* fix Safari 9 flex bug: https://github.com/philipwalton/flexbugs#flexbug-1 */
+          flex-shrink: 0;
+          /* fix Safari 9 flex bug: https://github.com/philipwalton/flexbugs#flexbug-1 */
         }
 
         :host([hidden]) {
           display: none !important;
+        }
+
+        :host(.hidden-attribute) {
+          display: none;
         }
       </style>
       <slot></slot>
@@ -116,17 +121,18 @@
     </template>
   </test-fixture>
 
-  <test-fixture id="listHidden">
-      <template>
-        <test-list-element style="width: 400px; height: 400px;">
-          <test-item-element>Foo</test-item-element>
-          <test-item-element hidden>Bar</test-item-element>
-          <test-item-element>Bax</test-item-element>
-          <test-item-element disabled>Bay</test-item-element>
-          <test-item-element>Fox</test-item-element>
-        </test-list-element>
-      </template>
-    </test-fixture>
+  <test-fixture id="list-hidden">
+    <template>
+      <test-list-element style="width: 400px; height: 400px;">
+        <test-item-element>Foo</test-item-element>
+        <test-item-element hidden>Bar</test-item-element>
+        <test-item-element>Bax</test-item-element>
+        <test-item-element style="display: none;">Bay</test-item-element>
+        <test-item-element>Fox</test-item-element>
+        <test-item-element class="hidden-attribute">Pub</test-item-element>
+      </test-list-element>
+    </template>
+  </test-fixture>
 
   <script>
     function arrowDown(target) {
@@ -187,7 +193,6 @@
 
         it('should update items list when removing nodes', () => {
           expect(list.items.length).to.be.equal(7);
-
           list.removeChild(list.items[3]);
           list._observer.flush();
           expect(list.items.length).to.be.equal(6);
@@ -615,7 +620,7 @@
       let list;
 
       beforeEach(done => {
-        list = fixture('listHidden');
+        list = fixture('list-hidden');
         Polymer.RenderStatus.afterNextRender(list, done);
       });
 
@@ -623,10 +628,19 @@
 
         beforeEach(() => list._focus(0));
 
-        it('should move focus to next not hidden element on "arrow-down" keydown', () => {
+        it('should move focus to next not hidden element on "arrow-down" keydown, from element is not hidden and the next is hidden', () => {
+          expect(list.items[0].focused).to.be.true;
+          expect(window.ShadyCSS.getComputedStyleValue(list.items[0], 'display')).to.equal('block');
           arrowDown(list);
-          expect(list.items[1].focused).to.be.false;
+          expect(window.ShadyCSS.getComputedStyleValue(list.items[1], 'display')).to.equal('none');
           expect(list.items[2].focused).to.be.true;
+        });
+        it('should move focus to next not hidden element on "arrow-up" keyup, from element is not hidden and the next is hidden', () => {
+          expect(list.items[0].focused).to.be.true;
+          expect(window.ShadyCSS.getComputedStyleValue(list.items[0], 'display')).to.equal('block');
+          arrowUp(list);
+          expect(window.ShadyCSS.getComputedStyleValue(list.items[list.items.length - 1], 'display')).to.equal('none');
+          expect(list.items[list.items.length - 2].focused).to.be.true;
         });
       });
     });
