@@ -628,18 +628,18 @@
 
         beforeEach(() => list._focus(0));
 
-        it('should move focus to next not hidden element on "arrow-down" keydown, from element is not hidden and the next is hidden', () => {
+        it('should move focus to next not hidden element on "arrow-down"', () => {
           expect(list.items[0].focused).to.be.true;
-          expect(window.ShadyCSS.getComputedStyleValue(list.items[0], 'display')).to.equal('block');
+          expect(getComputedStyle(list.items[0]).getPropertyValue('display')).to.equal('block');
           arrowDown(list);
-          expect(window.ShadyCSS.getComputedStyleValue(list.items[1], 'display')).to.equal('none');
+          expect(getComputedStyle(list.items[1]).getPropertyValue('display')).to.equal('none');
           expect(list.items[2].focused).to.be.true;
         });
-        it('should move focus to next not hidden element on "arrow-up" keyup, from element is not hidden and the next is hidden', () => {
+        it('should move focus to next not hidden element on "arrow-up"', () => {
           expect(list.items[0].focused).to.be.true;
-          expect(window.ShadyCSS.getComputedStyleValue(list.items[0], 'display')).to.equal('block');
+          expect(getComputedStyle(list.items[0]).getPropertyValue('display')).to.equal('block');
           arrowUp(list);
-          expect(window.ShadyCSS.getComputedStyleValue(list.items[list.items.length - 1], 'display')).to.equal('none');
+          expect(getComputedStyle(list.items[list.items.length - 1]).getPropertyValue('display')).to.equal('none');
           expect(list.items[list.items.length - 2].focused).to.be.true;
         });
       });
