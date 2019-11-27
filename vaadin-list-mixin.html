@@ -166,7 +166,7 @@ This program is available under Apache License Version 2.0, available at https:/
         return;
       }
 
-      const condition = item => !(item.disabled || getComputedStyle(item).getPropertyValue('display') == 'none');
+      const condition = item => !(item.disabled || getComputedStyle(item).getPropertyValue('display') === 'none');
       let idx, increment;
 
       if (this._vertical && key === 'Up' || !this._vertical && key === 'Left') {
@@ -192,7 +192,7 @@ This program is available under Apache License Version 2.0, available at https:/
 
     _getAvailableIndex(idx, increment, condition) {
       const totalItems = this.items.length;
-      for (let i = 0; typeof idx == 'number' && i < totalItems; i++ , idx += (increment || 1)) {
+      for (let i = 0; typeof idx == 'number' && i < totalItems; i++, idx += (increment || 1)) {
         if (idx < 0) {
           idx = totalItems - 1;
         } else if (idx >= totalItems) {
