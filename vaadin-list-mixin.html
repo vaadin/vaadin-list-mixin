@@ -124,9 +124,7 @@ This program is available under Apache License Version 2.0, available at https:/
 
       const item = this._filterItems(event.composedPath())[0];
       let idx;
-      if (item && !(item.disabled ||
-          this._isItemHidden(item)) &&
-          ((idx = this.items.indexOf(item)) >= 0)) {
+      if (item && !item.disabled && ((idx = this.items.indexOf(item)) >= 0)) {
         this.selected = idx;
       }
     }

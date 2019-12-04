@@ -130,6 +130,8 @@
         <test-item-element style="display: none;">Bay</test-item-element>
         <test-item-element>Fox</test-item-element>
         <test-item-element class="hidden-attribute">Pub</test-item-element>
+        <test-item-element>Bin</test-item-element>
+        <test-item-element style="display: none;">Bop</test-item-element>
       </test-list-element>
     </template>
   </test-fixture>
@@ -168,10 +170,11 @@
     }
 
     describe('vaadin-list-mixin', () => {
-      let list;
+      let list, list2;
 
       beforeEach(done => {
         list = fixture('list');
+        list2 = fixture('list-hidden');
         Polymer.RenderStatus.afterNextRender(list, done);
       });
 
@@ -268,6 +271,11 @@
           [-1, -1, -1, 0].forEach((val, idx) => expect(list.items[idx].tabIndex).to.be.equal(val));
         });
 
+        it('should not set tabIndex=0 to hidden items, but the next one in the loop', () => {
+          list2._focus(3);
+          [-1, -1, -1, -1, 0].forEach((val, idx) => expect(list2.items[idx].tabIndex).to.be.equal(val));
+        });
+
         it('should have a `focus()` method focusing item with `tabIndex=0`', done => {
           list._setFocusable(3);
           list.items[3].focus = () => done();
@@ -349,6 +357,12 @@
           expect(list.items[3].focused).to.be.true;
         });
 
+        it('focus loop should skip hidden items', () => {
+          arrowDown(list);
+          arrowDown(list);
+          expect(list.items[3].focused).to.be.true;
+        });
+
         it('should not focus anything when no matches are found', () => {
           keyDownChar(list, 'z');
           expect(list.items[0].focused).to.be.true;
@@ -396,6 +410,12 @@
           keyDownChar(list, 'b');
           keyDownChar(list, 'b');
           expect(list.items[3].focused).to.be.true;
+        });
+
+        it('key search should skip hidden items', () => {
+          keyDownChar(list2, 'b');
+          keyDownChar(list2, 'b');
+          expect(list2.items[6].focused).to.be.true;
         });
 
         it('key seacrh should accept items having non-text content before text', () => {
