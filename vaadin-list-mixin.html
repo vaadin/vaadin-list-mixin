@@ -124,7 +124,9 @@ This program is available under Apache License Version 2.0, available at https:/
 
       const item = this._filterItems(event.composedPath())[0];
       let idx;
-      if (item && !item.disabled && ((idx = this.items.indexOf(item)) >= 0)) {
+      if (item && !(item.disabled ||
+          getComputedStyle(item).getPropertyValue('display') === 'none') &&
+          ((idx = this.items.indexOf(item)) >= 0)) {
         this.selected = idx;
       }
     }
@@ -137,7 +139,7 @@ This program is available under Apache License Version 2.0, available at https:/
       );
       this._searchBuf += key.toLowerCase();
       const increment = 1;
-      const condition = item => !item.disabled &&
+      const condition = item => !(item.disabled || getComputedStyle(item).getPropertyValue('display') === 'none') &&
         item.textContent.replace(/[^a-zA-Z0-9]/g, '').toLowerCase().indexOf(this._searchBuf) === 0;
 
       if (!this.items.some(item => item.textContent.replace(/[^a-zA-Z0-9]/g, '').toLowerCase().indexOf(this._searchBuf) === 0)) {
@@ -208,18 +210,27 @@ This program is available under Apache License Version 2.0, available at https:/
       return -1;
     }
 
+    _setHidden(item) {
+      if (getComputedStyle(item).getPropertyValue('display') === 'none') {
+        item.hidden = true;
+      }
+    }
+
     _setFocusable(idx) {
-      idx = this._getAvailableIndex(idx, 1, item => !item.disabled);
+      idx = this._getAvailableIndex(idx, 1, item => !(item.disabled || getComputedStyle(item).getPropertyValue('display') === 'none'));
       const item = this.items[idx] || this.items[0];
       this.items.forEach(e => e.tabIndex = e === item ? 0 : -1);
     }
 
     _focus(idx) {
       const item = this.items[idx];
-      this.items.forEach(e => e.focused = e === item);
+      this._setHidden(item);
+      this.items.forEach(e => e.focused = (e === item && !(e.hidden || e.disabled)));
       this._setFocusable(idx);
-      this._scrollToItem(idx);
-      item.focus();
+      if (!(item.hidden || item.disabled)) {
+        this._scrollToItem(idx);
+        item.focus();
+      }
     }
 
     focus() {
