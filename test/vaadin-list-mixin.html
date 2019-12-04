@@ -170,11 +170,10 @@
     }
 
     describe('vaadin-list-mixin', () => {
-      let list, list2;
+      let list;
 
       beforeEach(done => {
         list = fixture('list');
-        list2 = fixture('list-hidden');
         Polymer.RenderStatus.afterNextRender(list, done);
       });
 
@@ -271,11 +270,6 @@
           [-1, -1, -1, 0].forEach((val, idx) => expect(list.items[idx].tabIndex).to.be.equal(val));
         });
 
-        it('should not set tabIndex=0 to hidden items, but the next one in the loop', () => {
-          list2._focus(3);
-          [-1, -1, -1, -1, 0].forEach((val, idx) => expect(list2.items[idx].tabIndex).to.be.equal(val));
-        });
-
         it('should have a `focus()` method focusing item with `tabIndex=0`', done => {
           list._setFocusable(3);
           list.items[3].focus = () => done();
@@ -357,12 +351,6 @@
           expect(list.items[3].focused).to.be.true;
         });
 
-        it('focus loop should skip hidden items', () => {
-          arrowDown(list);
-          arrowDown(list);
-          expect(list.items[3].focused).to.be.true;
-        });
-
         it('should not focus anything when no matches are found', () => {
           keyDownChar(list, 'z');
           expect(list.items[0].focused).to.be.true;
@@ -410,12 +398,6 @@
           keyDownChar(list, 'b');
           keyDownChar(list, 'b');
           expect(list.items[3].focused).to.be.true;
-        });
-
-        it('key search should skip hidden items', () => {
-          keyDownChar(list2, 'b');
-          keyDownChar(list2, 'b');
-          expect(list2.items[6].focused).to.be.true;
         });
 
         it('key seacrh should accept items having non-text content before text', () => {
@@ -636,7 +618,7 @@
         });
       });
     });
-    describe('vaadin-list-mixin-hidden', () => {
+    describe('hidden-items', () => {
       let list;
 
       beforeEach(done => {
@@ -655,12 +637,30 @@
           expect(getComputedStyle(list.items[1]).getPropertyValue('display')).to.equal('none');
           expect(list.items[2].focused).to.be.true;
         });
+
         it('should move focus to next not hidden element on "arrow-up"', () => {
           expect(list.items[0].focused).to.be.true;
           expect(getComputedStyle(list.items[0]).getPropertyValue('display')).to.equal('block');
           arrowUp(list);
           expect(getComputedStyle(list.items[list.items.length - 1]).getPropertyValue('display')).to.equal('none');
           expect(list.items[list.items.length - 2].focused).to.be.true;
+        });
+
+        it('should not set tabIndex=0 to hidden items, but the next one in the loop', () => {
+          list._focus(1);
+          [-1, -1, 0].forEach((val, idx) => expect(list.items[idx].tabIndex).to.be.equal(val));
+        });
+
+        it('key search should skip hidden items', () => {
+          keyDownChar(list, 'b');
+          keyDownChar(list, 'b');
+          expect(list.items[6].focused).to.be.true;
+        });
+
+        it('focus loop should skip hidden items', () => {
+          arrowDown(list);
+          arrowDown(list);
+          expect(list.items[4].focused).to.be.true;
         });
       });
     });
