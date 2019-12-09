@@ -651,13 +651,13 @@
           [-1, -1, 0].forEach((val, idx) => expect(list.items[idx].tabIndex).to.be.equal(val));
         });
 
-        it('key search should skip hidden items', () => {
+        it('should skip hidden items to key search', () => {
           keyDownChar(list, 'b');
           keyDownChar(list, 'b');
           expect(list.items[6].focused).to.be.true;
         });
 
-        it('focus loop should skip hidden items', () => {
+        it('should skip hidden items to focus loop', () => {
           arrowDown(list);
           arrowDown(list);
           expect(list.items[4].focused).to.be.true;
