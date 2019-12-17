@@ -213,7 +213,7 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     _setFocusable(idx) {
-      idx = this._getAvailableIndex(idx, 1, item => !(item.disabled || this._isItemHidden(item)));
+      idx = this._getAvailableIndex(idx, 1, item => !item.disabled);
       const item = this.items[idx] || this.items[0];
       this.items.forEach(e => e.tabIndex = e === item ? 0 : -1);
     }
