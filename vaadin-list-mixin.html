@@ -170,7 +170,7 @@ This program is available under Apache License Version 2.0, available at https:/
       let idx, increment;
 
       const hostIsRTL = this.getAttribute('dir') === 'rtl';
-      const dirIncrement = hostIsRTL ? -1 : 1;
+      const dirIncrement = !this._vertical && hostIsRTL ? -1 : 1;
 
       if (this._vertical && key === 'Up' || !this._vertical && key === 'Left') {
         increment = -dirIncrement;

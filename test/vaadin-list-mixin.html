@@ -285,14 +285,14 @@
 
           beforeEach(() => list.setAttribute('dir', 'rtl'));
 
-          it('should move focus to prev element on "arrow-up" keydown', () => {
-            arrowUp(list);
+          it('should move focus to next element on "arrow-down" keydown', () => {
+            arrowDown(list);
             expect(list.items[1].focused).to.be.true;
           });
 
-          it('should move focus to next element on "arrow-down" keydown', () => {
-            arrowUp(list);
+          it('should move focus to prev element on "arrow-up" keydown', () => {
             arrowDown(list);
+            arrowUp(list);
             expect(list.items[0].focused).to.be.true;
           });
 
