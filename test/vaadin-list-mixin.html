@@ -281,6 +281,47 @@
 
         beforeEach(() => list._focus(0));
 
+        describe('RTL mode', () => {
+
+          beforeEach(() => list.setAttribute('dir', 'rtl'));
+
+          it('should move focus to prev element on "arrow-up" keydown', () => {
+            arrowUp(list);
+            expect(list.items[1].focused).to.be.true;
+          });
+
+          it('should move focus to next element on "arrow-down" keydown', () => {
+            arrowUp(list);
+            arrowDown(list);
+            expect(list.items[0].focused).to.be.true;
+          });
+
+          it('should move focus to prev element on "arrow-left" keydown', () => {
+            list.orientation = 'horizontal';
+            arrowLeft(list);
+            expect(list.items[1].focused).to.be.true;
+          });
+
+          it('should move focus to next element on "arrow-right" keydown', () => {
+            list.orientation = 'horizontal';
+            arrowLeft(list);
+            arrowRight(list);
+            expect(list.items[0].focused).to.be.true;
+          });
+
+          it('should move focus to last element on "home" keydown', () => {
+            list._focus(3);
+            home(list);
+            expect(list.items[6].focused).to.be.true;
+          });
+
+          it('should move focus to first element on "end" keydown', () => {
+            end(list);
+            expect(list.items[0].focused).to.be.true;
+          });
+
+        });
+
         it('should move focus to next element on "arrow-down" keydown', () => {
           arrowDown(list);
           expect(list.items[1].focused).to.be.true;
