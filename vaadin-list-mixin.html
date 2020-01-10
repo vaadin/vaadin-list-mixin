@@ -169,16 +169,23 @@ This program is available under Apache License Version 2.0, available at https:/
       const condition = item => !(item.disabled || this._isItemHidden(item));
       let idx, increment;
 
+      const hostIsRTL = this.getAttribute('dir') === 'rtl';
+      const dirIncrement = hostIsRTL ? -1 : 1;
+
       if (this._vertical && key === 'Up' || !this._vertical && key === 'Left') {
-        increment = -1;
-        idx = currentIdx - 1;
+        increment = -dirIncrement;
+        idx = currentIdx - dirIncrement;
       } else if (this._vertical && key === 'Down' || !this._vertical && key === 'Right') {
-        increment = 1;
-        idx = currentIdx + 1;
-      } else if (key === 'Home') {
+        increment = dirIncrement;
+        idx = currentIdx + dirIncrement;
+      } else if (
+        (key === 'Home' && !hostIsRTL) ||
+        (key === 'End' && hostIsRTL)) {
         increment = 1;
         idx = 0;
-      } else if (key === 'End') {
+      } else if (
+        (key === 'End' && !hostIsRTL) ||
+        (key === 'Home' && hostIsRTL)) {
         increment = -1;
         idx = this.items.length - 1;
       }
