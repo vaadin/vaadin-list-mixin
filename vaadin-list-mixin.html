@@ -169,8 +169,8 @@ This program is available under Apache License Version 2.0, available at https:/
       const condition = item => !(item.disabled || this._isItemHidden(item));
       let idx, increment;
 
-      const hostIsRTL = this.getAttribute('dir') === 'rtl';
-      const dirIncrement = !this._vertical && hostIsRTL ? -1 : 1;
+      const isRTL = !this._vertical && this.getAttribute('dir') === 'rtl';
+      const dirIncrement = isRTL ? -1 : 1;
 
       if (this._vertical && key === 'Up' || !this._vertical && key === 'Left') {
         increment = -dirIncrement;
@@ -178,14 +178,10 @@ This program is available under Apache License Version 2.0, available at https:/
       } else if (this._vertical && key === 'Down' || !this._vertical && key === 'Right') {
         increment = dirIncrement;
         idx = currentIdx + dirIncrement;
-      } else if (
-        (key === 'Home' && !hostIsRTL) ||
-        (key === 'End' && hostIsRTL)) {
+      } else if ((key === 'Home' && !isRTL) || (key === 'End' && isRTL)) {
         increment = 1;
         idx = 0;
-      } else if (
-        (key === 'End' && !hostIsRTL) ||
-        (key === 'Home' && hostIsRTL)) {
+      } else if ((key === 'End' && !isRTL) || (key === 'Home' && isRTL)) {
         increment = -1;
         idx = this.items.length - 1;
       }
