@@ -4,6 +4,7 @@ Copyright (c) 2017 Vaadin Ltd.
 This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
 -->
 <link rel="import" href="../polymer/lib/utils/flattened-nodes-observer.html">
+<link rel="import" href="../vaadin-element-mixin/vaadin-dir-helper.html">
 
 <script>
   /**
@@ -276,7 +277,13 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     _scroll(pixels) {
-      this._scrollerElement['scroll' + (this._vertical ? 'Top' : 'Left')] += pixels;
+      if (this._vertical) {
+        this._scrollerElement['scrollTop'] += pixels;
+      } else {
+        const scrollType = Vaadin.DirHelper.detectScrollType();
+        const scrollLeft = Vaadin.DirHelper.getNormalizedScrollLeft(scrollType, this.getAttribute('dir') || 'ltr', this._scrollerElement) + pixels;
+        Vaadin.DirHelper.setNormalizedScrollLeft(scrollType, this.getAttribute('dir') || 'ltr', this._scrollerElement, scrollLeft);
+      }
     }
 
     /**
