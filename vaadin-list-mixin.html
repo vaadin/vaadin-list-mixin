@@ -182,10 +182,10 @@ This program is available under Apache License Version 2.0, available at https:/
       } else if (this._vertical && key === 'Down' || !this._vertical && key === 'Right') {
         increment = dirIncrement;
         idx = currentIdx + dirIncrement;
-      } else if ((key === 'Home' && !this._isRTL) || (key === 'End' && this._isRTL)) {
+      } else if (key === 'Home') {
         increment = 1;
         idx = 0;
-      } else if ((key === 'End' && !this._isRTL) || (key === 'Home' && this._isRTL)) {
+      } else if (key === 'End') {
         increment = -1;
         idx = this.items.length - 1;
       }

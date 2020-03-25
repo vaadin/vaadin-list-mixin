@@ -312,15 +312,15 @@
             expect(list.items[0].focused).to.be.true;
           });
 
-          it('should move focus to last element on "home" keydown', () => {
+          it('should move focus to first element on "home" keydown', () => {
             home(list);
-            expect(list.items[6].focused).to.be.true;
+            expect(list.items[0].focused).to.be.true;
           });
 
-          it('should move focus to first element on "end" keydown', () => {
+          it('should move focus to last element on "end" keydown', () => {
             list._focus(3);
             end(list);
-            expect(list.items[0].focused).to.be.true;
+            expect(list.items[6].focused).to.be.true;
           });
 
         });
