@@ -3,5 +3,10 @@
     "wct.conf.js",
     "demo/**/*",
     "test/**/*"
-  ]
+  ],
+  "autoImport": {
+    "./interfaces": [
+      "ListOrientation"
+    ]
+  }
 }
