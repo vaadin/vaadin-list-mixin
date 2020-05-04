@@ -60,7 +60,7 @@ This program is available under Apache License Version 2.0, available at https:/
          * Note: unlike `<vaadin-combo-box>`, this property is read-only,
          * so if you want to provide items by iterating array of data,
          * you have to use `dom-repeat` and place it to the light DOM.
-         * @type {Array<HTMLElement!> | null | undefined}
+         * @type {!Array<!Element> | undefined}
          */
         items: {
           type: Array,
@@ -123,8 +123,8 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     /**
-     * @param {Array<Element!>} array
-     * @return {Array<Element!>}
+     * @param {!Array<!Element>} array
+     * @return {!Array<!Element>}
      * @protected
      */
     _filterItems(array) {
@@ -132,7 +132,7 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     /**
-     * @param {MouseEvent!} event
+     * @param {!MouseEvent} event
      * @protected
      */
     _onClick(event) {
@@ -181,7 +181,7 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     /**
-     * @param {KeyboardEvent!} event
+     * @param {!KeyboardEvent} event
      * @protected
      */
     _onKeydown(event) {
@@ -231,7 +231,7 @@ This program is available under Apache License Version 2.0, available at https:/
     /**
      * @param {number} idx
      * @param {number} increment
-     * @param {Function} condition
+     * @param {function(!Element):boolean} condition
      * @return {number}
      * @protected
      */
@@ -254,7 +254,7 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     /**
-     * @param {Element} item
+     * @param {!Element} item
      * @return {boolean}
      * @protected
      */
@@ -292,8 +292,8 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     /**
+     * @return {!HTMLElement}
      * @protected
-     * @return {HTMLElement}
      */
     get _scrollerElement() {
       // Returning scroller element of the component
@@ -330,16 +330,16 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     /**
-     * @protected
      * @return {boolean}
+     * @protected
      */
     get _vertical() {
       return this.orientation !== 'horizontal';
     }
 
     /**
-     * @protected
      * @param {number} pixels
+     * @protected
      */
     _scroll(pixels) {
       if (this._vertical) {
