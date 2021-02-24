@@ -46,8 +46,6 @@ customElements.define(
         <style>
           :host {
             display: block;
-            flex-shrink: 0;
-            /* fix Safari 9 flex bug: https://github.com/philipwalton/flexbugs#flexbug-1 */
           }
 
           :host([hidden]) {
