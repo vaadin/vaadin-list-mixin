@@ -4,8 +4,7 @@ Copyright (c) 2017 Vaadin Ltd.
 This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
 */
 import { FlattenedNodesObserver } from '@polymer/polymer/lib/utils/flattened-nodes-observer.js';
-
-import '@vaadin/vaadin-element-mixin/vaadin-dir-helper.js';
+import { DirHelper } from '@vaadin/vaadin-element-mixin/vaadin-dir-helper.js';
 import { Debouncer } from '@polymer/polymer/lib/utils/debounce.js';
 import { timeOut } from '@polymer/polymer/lib/utils/async.js';
 
@@ -342,10 +341,10 @@ export const ListMixin = superClass => class VaadinListMixin extends superClass 
     if (this._vertical) {
       this._scrollerElement['scrollTop'] += pixels;
     } else {
-      const scrollType = Vaadin.DirHelper.detectScrollType();
-      const scrollLeft = Vaadin.DirHelper.getNormalizedScrollLeft(scrollType,
+      const scrollType = DirHelper.detectScrollType();
+      const scrollLeft = DirHelper.getNormalizedScrollLeft(scrollType,
         this.getAttribute('dir') || 'ltr', this._scrollerElement) + pixels;
-      Vaadin.DirHelper.setNormalizedScrollLeft(scrollType,
+      DirHelper.setNormalizedScrollLeft(scrollType,
         this.getAttribute('dir') || 'ltr', this._scrollerElement, scrollLeft);
     }
   }
