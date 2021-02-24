@@ -1,11 +1,4 @@
-import {FlattenedNodesObserver} from '@polymer/polymer/lib/utils/flattened-nodes-observer.js';
-
-import {Debouncer} from '@polymer/polymer/lib/utils/debounce.js';
-
-import {timeOut} from '@polymer/polymer/lib/utils/async.js';
-
-export {ListMixin};
-
+import { ListOrientation } from './interfaces';
 
 /**
  * A mixin for `nav` elements, facilitating navigation and selection of childNodes.
@@ -13,15 +6,16 @@ export {ListMixin};
 declare function ListMixin<T extends new (...args: any[]) => {}>(base: T): T & ListMixinConstructor;
 
 interface ListMixinConstructor {
-  new(...args: any[]): ListMixin;
+  new (...args: any[]): ListMixin;
 }
 
-export {ListMixinConstructor};
-
 interface ListMixin {
-  readonly focused: Element|null;
+  readonly focused: Element | null;
+
   readonly _isRTL: boolean;
+
   readonly _scrollerElement: HTMLElement;
+
   readonly _vertical: boolean;
 
   /**
@@ -33,7 +27,7 @@ interface ListMixin {
    * The index of the item selected in the items array.
    * Note: Not updated when used in `multiple` selection mode.
    */
-  selected: number|null|undefined;
+  selected: number | null | undefined;
 
   /**
    * Define how items are disposed in the dom.
@@ -53,23 +47,34 @@ interface ListMixin {
    * so if you want to provide items by iterating array of data,
    * you have to use `dom-repeat` and place it to the light DOM.
    */
-  readonly items: Element[]|undefined;
+  readonly items: Element[] | undefined;
+
   ready(): void;
+
   _filterItems(array: Element[]): Element[];
+
   _onClick(event: MouseEvent): void;
+
   _searchKey(currentIdx: number, key: string): number;
+
   _onKeydown(event: KeyboardEvent): void;
+
   _getAvailableIndex(idx: number, increment: number, condition: (p0: Element) => boolean): number;
+
   _isItemHidden(item: Element): boolean;
+
   _setFocusable(idx: number): void;
+
   _focus(idx: number): void;
+
   focus(): void;
 
   /**
    * Scroll the container to have the next item by the edge of the viewport.
    */
   _scrollToItem(idx: number): void;
+
   _scroll(pixels: number): void;
 }
 
-import {ListOrientation} from './interfaces';
+export { ListMixin, ListMixinConstructor };
