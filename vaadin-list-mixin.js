@@ -341,11 +341,10 @@ export const ListMixin = superClass => class VaadinListMixin extends superClass 
     if (this._vertical) {
       this._scrollerElement['scrollTop'] += pixels;
     } else {
+      const dir = this.getAttribute('dir') || 'ltr';
       const scrollType = DirHelper.detectScrollType();
-      const scrollLeft = DirHelper.getNormalizedScrollLeft(scrollType,
-        this.getAttribute('dir') || 'ltr', this._scrollerElement) + pixels;
-      DirHelper.setNormalizedScrollLeft(scrollType,
-        this.getAttribute('dir') || 'ltr', this._scrollerElement, scrollLeft);
+      const scrollLeft = DirHelper.getNormalizedScrollLeft(scrollType, dir, this._scrollerElement) + pixels;
+      DirHelper.setNormalizedScrollLeft(scrollType, dir, this._scrollerElement, scrollLeft);
     }
   }
 
