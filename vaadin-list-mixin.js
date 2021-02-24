@@ -1,8 +1,8 @@
 /**
-@license
-Copyright (c) 2017 Vaadin Ltd.
-This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
-*/
+ * @license
+ * Copyright (c) 2021 Vaadin Ltd.
+ * This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
+ */
 import { FlattenedNodesObserver } from '@polymer/polymer/lib/utils/flattened-nodes-observer.js';
 import { DirHelper } from '@vaadin/vaadin-element-mixin/vaadin-dir-helper.js';
 import { Debouncer } from '@polymer/polymer/lib/utils/debounce.js';
