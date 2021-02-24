@@ -291,6 +291,8 @@ export const ListMixin = superClass => class VaadinListMixin extends superClass 
    */
   get _scrollerElement() {
     // Returning scroller element of the component
+    console.warn(`Please implement the '_scrollerElement' property in <${this.localName}>`);
+    return this;
   }
 
   /**
