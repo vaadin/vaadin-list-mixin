@@ -97,7 +97,6 @@ export const ListMixin = superClass => class VaadinListMixin extends superClass 
         this.setAttribute('aria-orientation', orientation || 'vertical');
         this.items.forEach(item => {
           orientation ? item.setAttribute('orientation', orientation) : item.removeAttribute('orientation');
-          item.updateStyles();
         });
 
         this._setFocusable(selected);
