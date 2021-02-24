@@ -1,9 +1,5 @@
 {
-  "name": "@vaadin/vaadin-list-mixin",
-  "version": "2.5.1",
   "description": "vaadin-list-mixin",
-  "main": "vaadin-list-mixin.html",
-  "repository": "vaadin/vaadin-list-mixin",
   "keywords": [
     "Vaadin",
     "vaadin-list-mixin",
@@ -11,31 +7,38 @@
     "web-component",
     "polymer"
   ],
+  "repository": "vaadin/vaadin-list-mixin",
+  "homepage": "https://vaadin.com/elements",
+  "name": "@vaadin/vaadin-list-mixin",
+  "version": "2.5.1",
+  "main": "vaadin-list-mixin.js",
   "author": "Vaadin Ltd",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/vaadin/vaadin-list-mixin/issues"
   },
-  "homepage": "https://vaadin.com/elements",
   "files": [
     "*.d.ts",
     "vaadin-*.js"
   ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint"
-    }
+  "resolutions": {
+    "es-abstract": "1.17.6",
+    "@types/doctrine": "0.0.3",
+    "inherits": "2.0.3",
+    "samsam": "1.1.3",
+    "supports-color": "3.1.2",
+    "type-detect": "1.0.0"
+  },
+  "dependencies": {
+    "@polymer/polymer": "^3.0.0",
+    "@vaadin/vaadin-element-mixin": "^2.4.1"
   },
   "scripts": {
-    "start": "polymer serve --port 3000",
-    "test": "wct",
-    "lint": "npm-run-all --parallel lint:*",
-    "lint:css": "stylelint *.html demo/*.html test/*html",
-    "lint:html": "eslint *.html demo test --ext .html",
-    "lint:js": "eslint *.js test",
-    "lint:polymer": "polymer lint --rules polymer-2 --input *.html"
+    "generate-typings": "gen-typescript-declarations --outDir . --verify"
   },
   "devDependencies": {
-    "@vaadin/vaadin-component-dev-dependencies": "^3.0.0"
+    "@polymer/iron-test-helpers": "^3.0.0",
+    "wct-browser-legacy": "^1.0.1",
+    "@webcomponents/webcomponentsjs": "^2.0.0"
   }
 }
