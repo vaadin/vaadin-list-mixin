@@ -185,8 +185,7 @@ export const ListMixin = superClass => class VaadinListMixin extends superClass 
       return;
     }
 
-    // IE names for arrows do not include the Arrow prefix
-    const key = event.key.replace(/^Arrow/, '');
+    const key = event.key;
 
     const currentIdx = this.items.indexOf(this.focused);
 
@@ -203,10 +202,10 @@ export const ListMixin = superClass => class VaadinListMixin extends superClass 
 
     const dirIncrement = this._isRTL ? -1 : 1;
 
-    if (this._vertical && key === 'Up' || !this._vertical && key === 'Left') {
+    if (this._vertical && key === 'ArrowUp' || !this._vertical && key === 'ArrowLeft') {
       increment = -dirIncrement;
       idx = currentIdx - dirIncrement;
-    } else if (this._vertical && key === 'Down' || !this._vertical && key === 'Right') {
+    } else if (this._vertical && key === 'ArrowDown' || !this._vertical && key === 'ArrowRight') {
       increment = dirIncrement;
       idx = currentIdx + dirIncrement;
     } else if (key === 'Home') {
