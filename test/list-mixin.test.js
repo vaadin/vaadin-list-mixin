@@ -1,113 +1,96 @@
-<!doctype html>
-
-<head>
-  <meta charset="UTF-8">
-  <title>vaadin-list-mixin tests</title>
-  <script src="../../../wct-browser-legacy/browser.js"></script>
-  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
-  <script src="../../../@polymer/iron-test-helpers/mock-interactions.js" type="module"></script>
-  <script type="module" src="../../../@polymer/iron-test-helpers/iron-test-helpers.js"></script>
-  <script type="module" src="../vaadin-multi-select-list-mixin.js"></script>
-  <script type="module" src="../../../@polymer/test-fixture/test-fixture.js"></script>
-</head>
-
-<body>
-  <dom-module id="test-list-element">
-    <template>
-      <style>
-        :host {
-          display: block;
-        }
-
-        #scroll {
-          overflow: auto;
-          display: flex;
-        }
-
-        :host([orientation="vertical"]) #scroll {
-          height: 100%;
-          flex-direction: column;
-        }
-      </style>
-      <div id="scroll">
-        <slot></slot>
-      </div>
-    </template>
-    <script type="module">
-import '@polymer/iron-test-helpers/iron-test-helpers.js';
+import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
+import { fixtureSync, nextFrame } from '@open-wc/testing-helpers';
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
+import { arrowDown, arrowLeft, arrowRight, arrowUp, home, end, keyDownChar } from './helpers.js';
 import { MultiSelectListMixin } from '../vaadin-multi-select-list-mixin.js';
-import '@polymer/test-fixture/test-fixture.js';
-import { PolymerElement } from '@polymer/polymer/polymer-element.js';
-class TestWrapper extends MultiSelectListMixin(PolymerElement) {
-  static get is() {
-    return 'test-list-element';
-  }
+import { ListMixin } from '../vaadin-list-mixin.js';
 
-  get _scrollerElement() {
-    return this.$.scroll;
-  }
-}
-customElements.define('test-list-element', TestWrapper);
-</script>
-  </dom-module>
+customElements.define(
+  'test-list-element',
+  class extends MultiSelectListMixin(PolymerElement) {
+    static get template() {
+      return html`
+        <style>
+          :host {
+            display: block;
+          }
 
-  <dom-module id="test-item-element">
-    <template>
-      <style>
-        :host {
-          display: block;
-          flex-shrink: 0;
-          /* fix Safari 9 flex bug: https://github.com/philipwalton/flexbugs#flexbug-1 */
-        }
+          #scroll {
+            overflow: auto;
+            display: flex;
+          }
 
-        :host([hidden]) {
-          display: none !important;
-        }
+          :host([orientation='vertical']) #scroll {
+            height: 100%;
+            flex-direction: column;
+          }
+        </style>
+        <div id="scroll">
+          <slot></slot>
+        </div>
+      `;
+    }
 
-        :host(.hidden-attribute) {
-          display: none;
-        }
-      </style>
-      <slot></slot>
-    </template>
-    <script type="module">
-import '@polymer/iron-test-helpers/iron-test-helpers.js';
-import '../vaadin-multi-select-list-mixin.js';
-import '@polymer/test-fixture/test-fixture.js';
-import { PolymerElement } from '@polymer/polymer/polymer-element.js';
-// Instead of extending Vaadin.ItemMixin, we have a simplified version of it.
-class TestElement extends PolymerElement {
-  static get is() {
-    return 'test-item-element';
-  }
-  static get properties() {
-    return {
-      _hasVaadinItemMixin: {
-        value: true
-      },
-      disabled: {
-        type: Boolean,
-        observer: '_disabledChanged'
-      },
-      selected: {
-        type: Boolean
-      }
-    };
-  }
-
-  _disabledChanged(disabled) {
-    if (disabled) {
-      // Simplified version of Vaadin.ItemMixin behavior
-      this.selected = false;
+    get _scrollerElement() {
+      return this.$.scroll;
     }
   }
-}
-customElements.define('test-item-element', TestElement);
-</script>
-  </dom-module>
+);
 
-  <test-fixture id="list">
-    <template>
+customElements.define(
+  'test-item-element',
+  class extends PolymerElement {
+    static get template() {
+      return html`
+        <style>
+          :host {
+            display: block;
+            flex-shrink: 0;
+            /* fix Safari 9 flex bug: https://github.com/philipwalton/flexbugs#flexbug-1 */
+          }
+
+          :host([hidden]) {
+            display: none !important;
+          }
+
+          :host(.hidden-attribute) {
+            display: none;
+          }
+        </style>
+        <slot></slot>
+      `;
+    }
+
+    static get properties() {
+      return {
+        _hasVaadinItemMixin: {
+          value: true
+        },
+        disabled: {
+          type: Boolean,
+          observer: '_disabledChanged'
+        },
+        selected: {
+          type: Boolean
+        }
+      };
+    }
+
+    _disabledChanged(disabled) {
+      if (disabled) {
+        // Simplified version of Vaadin.ItemMixin behavior
+        this.selected = false;
+      }
+    }
+  }
+);
+
+describe('vaadin-list-mixin', () => {
+  let list;
+
+  beforeEach(() => {
+    list = fixtureSync(`
       <test-list-element style="width: 400px; height: 400px;">
         <test-item-element>Foo</test-item-element>
         <test-item-element>Bar</test-item-element>
@@ -122,84 +105,27 @@ customElements.define('test-item-element', TestElement);
         </test-item-element>
         <test-item-element>Bax</test-item-element>
       </test-list-element>
-    </template>
-  </test-fixture>
-
-  <test-fixture id="list-hidden">
-    <template>
-      <test-list-element style="width: 400px; height: 400px;">
-        <test-item-element>Foo</test-item-element>
-        <test-item-element hidden>Bar</test-item-element>
-        <test-item-element>Bax</test-item-element>
-        <test-item-element style="display: none;">Bay</test-item-element>
-        <test-item-element>Fox</test-item-element>
-        <test-item-element class="hidden-attribute">Pub</test-item-element>
-        <test-item-element>Bin</test-item-element>
-        <test-item-element style="display: none;">Bop</test-item-element>
-      </test-list-element>
-    </template>
-  </test-fixture>
-
-  <script type="module">
-import '@polymer/iron-test-helpers/iron-test-helpers.js';
-import '../vaadin-multi-select-list-mixin.js';
-import '@polymer/test-fixture/test-fixture.js';
-import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
-function arrowDown(target) {
-  MockInteractions.keyDownOn(target, 40, [], 'ArrowDown');
-}
-
-function arrowRight(target) {
-  MockInteractions.keyDownOn(target, 39, [], 'ArrowRight');
-}
-
-function arrowDownIE(target) {
-  MockInteractions.keyDownOn(target, 40, [], 'Down');
-}
-
-function arrowUp(target) {
-  MockInteractions.keyDownOn(target, 38, [], 'ArrowUp');
-}
-
-function arrowLeft(target) {
-  MockInteractions.keyDownOn(target, 37, [], 'ArrowLeft');
-}
-
-function home(target) {
-  MockInteractions.keyDownOn(target, 36, [], 'Home');
-}
-
-function end(target) {
-  MockInteractions.keyDownOn(target, 35, [], 'End');
-}
-
-function keyDownChar(target, letter, modifier) {
-  MockInteractions.keyDownOn(target, letter.charCodeAt(0), modifier, letter);
-}
-
-describe('vaadin-list-mixin', () => {
-  let list;
-
-  beforeEach(done => {
-    list = fixture('list');
-    afterNextRender(list, done);
+    `);
   });
 
-  it('should have a list of valid items after the DOM `_observer` has been run', () => {
-    // DOM _observer runs asynchronously, we need to flush to access items
-    list._observer.flush();
-    expect(list.items.length).to.be.equal(7);
+  describe('items observer', () => {
+    it('should have a list of valid items after the DOM `_observer` has been run', () => {
+      // DOM _observer runs asynchronously, we need to flush to access items
+      list._observer.flush();
+      expect(list.items.length).to.be.equal(7);
+    });
+
+    it('`focus` should flush the `_observer` if it is called too soon', () => {
+      // focus flushes the observer in order to be run in 3rd party elements initialization
+      list.focus();
+      expect(list.items.length).to.be.equal(7);
+    });
   });
 
-  it('`focus` should flush the `_observer` if it is called too soon', () => {
-    // focus flushes the observer in order to be run in 3rd party elements initialisation
-    list.focus();
-    expect(list.items.length).to.be.equal(7);
-  });
-
-  describe('dom', () => {
-
-    beforeEach(() => list._observer.flush());
+  describe('DOM', () => {
+    beforeEach(() => {
+      list._observer.flush();
+    });
 
     it('should update items list when removing nodes', () => {
       expect(list.items.length).to.be.equal(7);
@@ -222,19 +148,17 @@ describe('vaadin-list-mixin', () => {
       expect(list.items[2]).to.be.equal(e4);
       expect(list.items[3]).to.be.equal(e2);
     });
-
-    it('should call updateStyles() on the added items', () => {
-      const item = document.createElement('test-item-element');
-      const spy = sinon.spy(item, 'updateStyles');
-      list.appendChild(item);
-      list._observer.flush();
-      expect(spy).to.be.calledOnce;
-    });
   });
 
   describe('selection', () => {
+    beforeEach(() => {
+      list._observer.flush();
+    });
+
     it('should not select any item by default', () => {
-      list.items.forEach(e => expect(!!list.items[0].selected).to.be.false);
+      list.items.forEach((item) => {
+        expect(item.selected).to.be.false;
+      });
     });
 
     it('should select an item when `selected` property is set', () => {
@@ -257,15 +181,15 @@ describe('vaadin-list-mixin', () => {
       list.items[3].firstElementChild.click();
       expect(list.selected).to.be.equal(3);
     });
-
   });
 
   describe('tabIndex', () => {
-    it('should set tabIndex=-1 to all items, but the first', done => {
-      afterNextRender(list, () => {
-        [0, -1, -1, -1].forEach((val, idx) => expect(list.items[idx].tabIndex).to.be.equal(val));
-        done();
-      });
+    beforeEach(() => {
+      list._observer.flush();
+    });
+
+    it('should set tabIndex=-1 to all items, but the first', () => {
+      [0, -1, -1, -1].forEach((val, idx) => expect(list.items[idx].tabIndex).to.be.equal(val));
     });
 
     it('should move tabIndex when moving focus', () => {
@@ -278,7 +202,7 @@ describe('vaadin-list-mixin', () => {
       [-1, -1, -1, 0].forEach((val, idx) => expect(list.items[idx].tabIndex).to.be.equal(val));
     });
 
-    it('should have a `focus()` method focusing item with `tabIndex=0`', done => {
+    it('should have a `focus()` method focusing item with `tabIndex=0`', (done) => {
       list._setFocusable(3);
       list.items[3].focus = () => done();
       list.focus();
@@ -286,11 +210,12 @@ describe('vaadin-list-mixin', () => {
   });
 
   describe('focus', () => {
-
-    beforeEach(() => list._focus(0));
+    beforeEach(() => {
+      list._observer.flush();
+      list._focus(0);
+    });
 
     describe('RTL mode', () => {
-
       beforeEach(() => {
         list.orientation = 'horizontal';
         list.setAttribute('dir', 'rtl');
@@ -330,16 +255,10 @@ describe('vaadin-list-mixin', () => {
         end(list);
         expect(list.items[6].focused).to.be.true;
       });
-
     });
 
     it('should move focus to next element on "arrow-down" keydown', () => {
       arrowDown(list);
-      expect(list.items[1].focused).to.be.true;
-    });
-
-    it('should move focus when event.key name does not include the Arrow prefix (IE)', () => {
-      arrowDownIE(list);
       expect(list.items[1].focused).to.be.true;
     });
 
@@ -418,14 +337,14 @@ describe('vaadin-list-mixin', () => {
       expect(list.items[6].focused).to.be.true;
     });
 
-    it('should reset search buffer after 500ms without any key presses', done => {
+    it('should reset search buffer after 500ms without any key presses', async () => {
+      const clock = sinon.useFakeTimers();
       keyDownChar(list, 'b');
       keyDownChar(list, 'a');
-      setTimeout(() => {
-        keyDownChar(list, 'x');
-        expect(list.items[5].focused).to.be.true;
-        done();
-      }, 500);
+      await clock.tickAsync(500);
+      keyDownChar(list, 'x');
+      expect(list.items[5].focused).to.be.true;
+      clock.restore();
     });
 
     it('key search should cycle through items starting with the same letters', () => {
@@ -452,7 +371,7 @@ describe('vaadin-list-mixin', () => {
       expect(list.items[3].focused).to.be.true;
     });
 
-    it('key seacrh should accept items having non-text content before text', () => {
+    it('key search should accept items having non-text content before text', () => {
       keyDownChar(list, 'x');
       expect(list.items[5].focused).to.be.true;
     });
@@ -472,14 +391,16 @@ describe('vaadin-list-mixin', () => {
     });
 
     it('should not throw when items is not defined', () => {
-      const listElement = window.document.createElement('test-list-element');
-      expect(() => {
-        listElement.focus();
-      }).not.to.throw();
+      const listElement = document.createElement('test-list-element');
+      expect(() => listElement.focus()).not.to.throw(Error);
     });
   });
 
   describe('orientation', () => {
+    beforeEach(() => {
+      list._observer.flush();
+    });
+
     it('if not orientation set, aria-orientation attribute should set to vertical', () => {
       expect(list.getAttribute('aria-orientation')).to.be.equal('vertical');
     });
@@ -495,14 +416,14 @@ describe('vaadin-list-mixin', () => {
     });
 
     it('should not have orientation attribute on each item if orientation is not set', () => {
-      list.querySelectorAll('test-item-element').forEach(item => {
+      list.querySelectorAll('test-item-element').forEach((item) => {
         expect(item.hasAttribute('orientation')).to.be.false;
       });
     });
 
     it('should have orientation attribute on each item', () => {
       list.orientation = 'horizontal';
-      list.querySelectorAll('test-item-element').forEach(item => {
+      list.querySelectorAll('test-item-element').forEach((item) => {
         expect(item.getAttribute('orientation')).to.be.equal('horizontal');
       });
     });
@@ -510,22 +431,19 @@ describe('vaadin-list-mixin', () => {
     it('should change orientation attribute on each item', () => {
       list.orientation = 'horizontal';
       list.orientation = 'vertical';
-      list.querySelectorAll('test-item-element').forEach(item => {
+      list.querySelectorAll('test-item-element').forEach((item) => {
         expect(item.getAttribute('orientation')).to.be.equal('vertical');
       });
     });
 
-    it('should have vertical attribute on newly added item', done => {
+    it('should have vertical attribute on newly added item', async () => {
       list.orientation = 'vertical';
 
       const item = document.createElement('test-item-element');
-      item.innerText = 'foo';
+      item.textContent = 'foo';
       list.appendChild(item);
-
-      setTimeout(() => {
-        expect(item.hasAttribute('orientation')).to.be.true;
-        done();
-      }, 0);
+      await nextFrame();
+      expect(item.hasAttribute('orientation')).to.be.true;
     });
 
     it('should have a protected boolean property to check vertical orientation', () => {
@@ -537,6 +455,7 @@ describe('vaadin-list-mixin', () => {
 
   describe('Scroll', () => {
     beforeEach(() => {
+      list._observer.flush();
       list.style.width = list.style.height = '50px';
     });
 
@@ -573,18 +492,12 @@ describe('vaadin-list-mixin', () => {
       list.orientation = 'vertical';
       expect(list._scrollerElement.scrollTop).to.be.equal(0);
 
-      // iOS 10 needs change the display to work
-      list.style.display = 'flex';
-
-      // FIXME: using _scroll because _scrollToItem does not work in IE11 in vertical mode.
-      // list._scrollToItem(1);
-      list._scroll(1);
+      list._scrollToItem(1);
 
       expect(list._scrollerElement.scrollTop).to.be.greaterThan(0);
     });
 
     describe('RTL mode', () => {
-
       beforeEach(() => {
         list.orientation = 'horizontal';
         list.setAttribute('dir', 'rtl');
@@ -612,13 +525,17 @@ describe('vaadin-list-mixin', () => {
     });
   });
 
-  describe('Disable', () => {
+  describe('disabled', () => {
+    beforeEach(() => {
+      list._observer.flush();
+    });
+
     it('when list and items are disabled the previously selected item should be selected after enabling the list', () => {
       list.selected = 3;
       expect(list.items[3].selected).to.be.true;
 
       list.disabled = true;
-      list.items.forEach(item => item.disabled = true);
+      list.items.forEach((item) => (item.disabled = true));
       expect(list.items[3].selected).to.be.false;
 
       list.disabled = false;
@@ -626,7 +543,11 @@ describe('vaadin-list-mixin', () => {
     });
   });
 
-  describe('Multiple', () => {
+  describe('multiple', () => {
+    beforeEach(() => {
+      list._observer.flush();
+    });
+
     it('should clear selected when multiple=true', () => {
       list.selected = 3;
       list.multiple = true;
@@ -650,7 +571,7 @@ describe('vaadin-list-mixin', () => {
       list.multiple = true;
       list.selectedValues = [1, 3];
       list.multiple = false;
-      expect(list.items.filter(item => item.selected).length).to.eql(0);
+      expect(list.items.filter((item) => item.selected).length).to.eql(0);
     });
 
     it('should set selectedValues when clicking item', () => {
@@ -690,12 +611,10 @@ describe('vaadin-list-mixin', () => {
     it('should fire one selected-values-changed event', () => {
       list.multiple = true;
       const spy = sinon.spy();
-      list.addEventListener('selected-values-changed', e => {
-        expect(e.detail.value).to.eql([3]);
-        spy();
-      });
+      list.addEventListener('selected-values-changed', spy);
       list.items[3].click();
       expect(spy.calledOnce).to.be.true;
+      expect(spy.firstCall.args[0].detail.value).to.eql([3]);
     });
 
     it('when orientation is horizontal should move scroll horizontally on item selection', () => {
@@ -720,51 +639,75 @@ describe('vaadin-list-mixin', () => {
     });
   });
 });
-describe('hidden-items', () => {
+
+describe('hidden items', () => {
   let list;
 
-  beforeEach(done => {
-    list = fixture('list-hidden');
-    afterNextRender(list, done);
+  beforeEach(() => {
+    list = fixtureSync(`
+      <test-list-element style="width: 400px; height: 400px;">
+        <test-item-element>Foo</test-item-element>
+        <test-item-element hidden>Bar</test-item-element>
+        <test-item-element>Bax</test-item-element>
+        <test-item-element style="display: none;">Bay</test-item-element>
+        <test-item-element>Fox</test-item-element>
+        <test-item-element class="hidden-attribute">Pub</test-item-element>
+        <test-item-element>Bin</test-item-element>
+        <test-item-element style="display: none;">Bop</test-item-element>
+      </test-list-element>
+    `);
+    list._observer.flush();
+    list._focus(0);
   });
 
-  describe('focus', () => {
+  it('should move focus to next not hidden element on "arrow-down"', () => {
+    expect(list.items[0].focused).to.be.true;
+    expect(getComputedStyle(list.items[0]).getPropertyValue('display')).to.equal('block');
+    arrowDown(list);
+    expect(getComputedStyle(list.items[1]).getPropertyValue('display')).to.equal('none');
+    expect(list.items.filter((item) => item.textContent === 'Bax')[0].focused).to.be.true;
+  });
 
-    beforeEach(() => list._focus(0));
+  it('should move focus to next not hidden element on "arrow-up"', () => {
+    expect(list.items[0].focused).to.be.true;
+    expect(getComputedStyle(list.items[0]).getPropertyValue('display')).to.equal('block');
+    arrowUp(list);
+    expect(getComputedStyle(list.items[list.items.length - 1]).getPropertyValue('display')).to.equal('none');
+    expect(list.items.filter((item) => item.textContent === 'Bin')[0].focused).to.be.true;
+  });
 
-    it('should move focus to next not hidden element on "arrow-down"', () => {
-      expect(list.items[0].focused).to.be.true;
-      expect(getComputedStyle(list.items[0]).getPropertyValue('display')).to.equal('block');
-      arrowDown(list);
-      expect(getComputedStyle(list.items[1]).getPropertyValue('display')).to.equal('none');
-      expect(list.items.filter(item => item.textContent === 'Bax')[0].focused).to.be.true;
-    });
+  it('should not set tabIndex=0 to hidden items, but the next one in the loop', () => {
+    arrowDown(list);
+    [-1, -1, 0].forEach((val, idx) => expect(list.items[idx].tabIndex).to.be.equal(val));
+  });
 
-    it('should move focus to next not hidden element on "arrow-up"', () => {
-      expect(list.items[0].focused).to.be.true;
-      expect(getComputedStyle(list.items[0]).getPropertyValue('display')).to.equal('block');
-      arrowUp(list);
-      expect(getComputedStyle(list.items[list.items.length - 1]).getPropertyValue('display')).to.equal('none');
-      expect(list.items.filter(item => item.textContent === 'Bin')[0].focused).to.be.true;
-    });
+  it('should skip hidden items to key search', () => {
+    keyDownChar(list, 'b');
+    keyDownChar(list, 'b');
+    expect(list.items.filter((item) => item.textContent === 'Bin')[0].focused).to.be.true;
+  });
 
-    it('should not set tabIndex=0 to hidden items, but the next one in the loop', () => {
-      arrowDown(list);
-      [-1, -1, 0].forEach((val, idx) => expect(list.items[idx].tabIndex).to.be.equal(val));
-    });
-
-    it('should skip hidden items to key search', () => {
-      keyDownChar(list, 'b');
-      keyDownChar(list, 'b');
-      expect(list.items.filter(item => item.textContent === 'Bin')[0].focused).to.be.true;
-    });
-
-    it('should skip hidden items to focus loop', () => {
-      arrowDown(list);
-      arrowDown(list);
-      expect(list.items.filter(item => item.textContent === 'Fox')[0].focused).to.be.true;
-    });
+  it('should skip hidden items to focus loop', () => {
+    arrowDown(list);
+    arrowDown(list);
+    expect(list.items.filter((item) => item.textContent === 'Fox')[0].focused).to.be.true;
   });
 });
-</script>
-</body>
+
+describe('_scrollerElement missing', () => {
+  beforeEach(() => {
+    sinon.stub(console, 'warn');
+  });
+
+  afterEach(() => {
+    console.warn.restore();
+  });
+
+  it('should warn when creating an element without focusElement', () => {
+    class ScrollerElementMissing extends ListMixin(PolymerElement) {}
+    customElements.define('scroller-element-missing', ScrollerElementMissing);
+    const instance = document.createElement('scroller-element-missing');
+    expect(instance._scrollerElement).to.equal(instance);
+    expect(console.warn.calledOnce).to.be.true;
+  });
+});
