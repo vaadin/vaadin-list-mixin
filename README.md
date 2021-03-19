@@ -4,6 +4,13 @@
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/vaadin/web-components?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 # vaadin-list-mixin
+
+> ⚠️ 　Starting from Vaadin 20, this project has migrated to [`vaadin-web-components`](https://github.com/vaadin/vaadin-web-components/tree/master/packages/vaadin-list-mixin) *monorepository*.
+>
+> This repository is used for Vaadin 14 LTS and Vaadin 19.
+
+---
+
 `vaadin-list-mixin` is a mixin for `nav` elements, facilitating navigation and selection of childNodes.
 
 ## Running tests in browser
