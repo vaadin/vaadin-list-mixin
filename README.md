@@ -1,17 +1,14 @@
+# vaadin-list-mixin
+
+> ⚠️ Starting from Vaadin 20, the source code and issues for this component mixin are migrated to the [`vaadin/web-components`](https://github.com/vaadin/web-components/tree/master/packages/vaadin-list-mixin) monorepository.
+> This repository contains the source code and releases of `@vaadin/vaadin-list-mixin` for the Vaadin versions 10 to 19.
+
+`vaadin-list-mixin` is a mixin for `nav` elements, facilitating navigation and selection of childNodes.
+
 ![Bower version](https://img.shields.io/bower/v/vaadin-list-mixin.svg)
 [![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/vaadin/vaadin-list-mixin)
 [![Build Status](https://travis-ci.org/vaadin/vaadin-list-mixin.svg?branch=master)](https://travis-ci.org/vaadin/vaadin-list-mixin)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/vaadin/web-components?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-
-# vaadin-list-mixin
-
-> ⚠️ 　Starting from Vaadin 20, this project has migrated to [`vaadin-web-components`](https://github.com/vaadin/vaadin-web-components/tree/master/packages/vaadin-list-mixin) *monorepository*.
->
-> This repository is used for Vaadin 14 LTS and Vaadin 19.
-
----
-
-`vaadin-list-mixin` is a mixin for `nav` elements, facilitating navigation and selection of childNodes.
 
 ## Running tests in browser
 
