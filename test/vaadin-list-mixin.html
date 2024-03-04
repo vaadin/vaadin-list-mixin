@@ -136,6 +136,26 @@
     </template>
   </test-fixture>
 
+  <test-fixture id="list-disabled">
+    <template>
+      <test-list-element>
+        <test-item-element disabled>Item 0</test-item-element>
+        <test-item-element disabled>Item 1</test-item-element>
+        <test-item-element>Item 2</test-item-element>
+        <test-item-element>Item 3</test-item-element>
+      </test-list-element>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="list-all-disabled">
+    <template>
+      <test-list-element>
+        <test-item-element disabled>Item 0</test-item-element>
+        <test-item-element disabled>Item 1</test-item-element>
+      </test-list-element>
+    </template>
+  </test-fixture>
+
   <script>
     function arrowDown(target) {
       MockInteractions.keyDownOn(target, 40, [], 'ArrowDown');
@@ -253,27 +273,42 @@
       });
 
       describe('tabIndex', () => {
-        it('should set tabIndex=-1 to all items, but the first', done => {
-          Polymer.RenderStatus.afterNextRender(list, () => {
-            [0, -1, -1, -1].forEach((val, idx) => expect(list.items[idx].tabIndex).to.be.equal(val));
-            done();
-          });
+        beforeEach(() => {
+          list = fixture('list-disabled');
+          list._observer.flush();
         });
 
-        it('should move tabIndex when moving focus', () => {
-          list._focus(3);
-          [-1, -1, -1, 0].forEach((val, idx) => expect(list.items[idx].tabIndex).to.be.equal(val));
+        it('should have the first not disabled item focusable by default', () => {
+          [-1, -1, 0, -1].forEach((val, idx) => expect(list.items[idx].tabIndex).to.equal(val));
         });
 
-        it('should not set tabIndex=0 to disabled items, but the next one in the loop', () => {
-          list._focus(2);
-          [-1, -1, -1, 0].forEach((val, idx) => expect(list.items[idx].tabIndex).to.be.equal(val));
-        });
-
-        it('should have a `focus()` method focusing item with `tabIndex=0`', done => {
+        it('should set a not disabled item focusable', () => {
           list._setFocusable(3);
-          list.items[3].focus = () => done();
+          [-1, -1, -1, 0].forEach((val, idx) => expect(list.items[idx].tabIndex).to.equal(val));
+        });
+
+        it('should not set a disabled item focusable but the next not disabled item instead', () => {
+          list._setFocusable(1);
+          [-1, -1, 0, -1].forEach((val, idx) => expect(list.items[idx].tabIndex).to.equal(val));
+        });
+
+        it('should call focus() method on the item when setting it focusable', () => {
+          list._setFocusable(3);
+          const spy = sinon.spy(list.items[3], 'focus');
           list.focus();
+          expect(spy.calledOnce).to.be.true;
+        });
+      });
+
+      describe('tabIndex when all the items are disabled', () => {
+        beforeEach(() => {
+          list = fixture('list-all-disabled');
+          list._observer.flush();
+        });
+
+        it('should not have any item focusable', () => {
+          expect(list.items[0].tabIndex).to.equal(-1);
+          expect(list.items[1].tabIndex).to.equal(-1);
         });
       });
 
