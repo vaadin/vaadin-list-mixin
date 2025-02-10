@@ -27,6 +27,9 @@
 
 ## Running tests from the command line
 
+> [!WARNING]
+> Running tests locally from the CLI does not work due to outdated dependencies. Run tests via SauceLabs or in the browser instead.
+
 1. Install [web-component-tester](https://www.npmjs.com/package/web-component-tester): `npm install -g web-component-tester`
 
 1. When in the `vaadin-list-mixin` directory, run `wct` or `npm test`
